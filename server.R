@@ -1,6 +1,6 @@
 # Define server logic required for FreezerVIS
 
-server <- function(session, input, output) {
+server <- function(input, output, session) {
   
   source("scripts/visualize.R")
   source("scripts/functions.R")
@@ -22,7 +22,7 @@ server <- function(session, input, output) {
       shinyjs::disable("selectFreezer")
       shinyjs::addClass("mask", "overlay")
       shinyjs::removeClass("mask", "hidden")
-      # refreshData(session, output, dsn)
+      refreshData(session, output, dsn)
       counts <- read_rds("data/counts.RDS")
       output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
       shinyjs::addClass("mask", "hidden")
@@ -62,5 +62,10 @@ server <- function(session, input, output) {
     if (!is.null(viz)) {
       output$plotBoxes <- renderPlotly(viz)
     }
+  })
+  
+  session$onSessionEnded(function() {
+	stopApp()
+	q("no")
   })
 }

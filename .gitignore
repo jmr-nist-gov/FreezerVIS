@@ -4,3 +4,6 @@
 /data
 /.Rproj.user
 .Rproj.user
+*.Rout
+*.ico
+*.lnk

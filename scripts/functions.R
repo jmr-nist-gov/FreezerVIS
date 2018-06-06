@@ -1,6 +1,6 @@
 
 packageCompliance <- function() {
-  success <- FALSE
+  success = FALSE
   if (require(odbc) == FALSE) {
     install.packages("odbc")
     library(odbc)
@@ -25,7 +25,7 @@ packageCompliance <- function() {
     install.packages("plotly")
     library(plotly)
   }
-  success <- TRUE
+  success = TRUE
   return(success)
 }
 
