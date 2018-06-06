@@ -116,7 +116,7 @@ vizBoxCount <- function(dat, freezer) {
 }
 
 
-vizFreezer <- function(dat, freezer, usePlotly=TRUE, saveMe=FALSE, saveFile=FALSE) {
+vizFreezer <- function(dat, freezer, inApp=FALSE, usePlotly=TRUE, saveMe=FALSE, saveFile=FALSE) {
   checkPackages()
   if (freezer %in% dat$FreezerPhysName) {
     out <- vizBoxCount(dat, freezer)
@@ -141,9 +141,17 @@ vizFreezer <- function(dat, freezer, usePlotly=TRUE, saveMe=FALSE, saveFile=FALS
           layout(margin = list(b = 40, l = 50, t = 30),
                  legend = list(y=0.97))
       }
-      print(out)
+      if (inApp) {
+        return(out)
+      } else {
+        print(out)
+      }
     } else {
-      print(out)
+      if (inApp) {
+        return(out)
+      } else {
+        print(out)
+      }
     }
     if (saveMe) {
       return(out)
@@ -152,6 +160,10 @@ vizFreezer <- function(dat, freezer, usePlotly=TRUE, saveMe=FALSE, saveFile=FALS
       write_rds(out, gsub(" ", "_", paste0("NIST_MESB_", freezer, "_visual_saved_", Sys.time(), ".RDS")))
     }
   } else {
-    cat(paste0("Freezer '", freezer, "' not found."))
+    if (inApp) {
+      return(NULL)
+    } else {
+      cat(paste0("Freezer '", freezer, "' not found."))
+    }
   }
 }
