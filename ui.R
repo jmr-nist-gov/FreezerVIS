@@ -1,5 +1,15 @@
 # Documentation
 
+
+source("scripts/visualize.R")
+source("scripts/functions.R")
+
+if (!packageCompliance()) {
+  shinyjs::alert("Package issue, please address and restart.")
+  stopApp()
+}
+
+
 ui <- fluidPage(
   title = "NIST Freezer VIS",
   div(id="mask", class="hidden", img(src="processing.gif"), h3("Refreshing collection data...")),

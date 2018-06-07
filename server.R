@@ -2,14 +2,6 @@
 
 server <- function(input, output, session) {
   
-  source("scripts/visualize.R")
-  source("scripts/functions.R")
-  
-  if (!packageCompliance()) {
-    shinyjs::alert("Package issue, please address and restart.")
-    stopApp()
-  }
-  
   dsn <- read_rds("data/DSN.RDS")
   
   if (isolate(input$refresh) == 0) {
@@ -66,6 +58,5 @@ server <- function(input, output, session) {
   
   session$onSessionEnded(function() {
 	stopApp()
-	q("no")
   })
 }
