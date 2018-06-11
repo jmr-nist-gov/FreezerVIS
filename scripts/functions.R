@@ -38,7 +38,7 @@ cleanUp <- function(aliquotCounts, freezerSections, freezers) {
   return(aliquotCounts)
 }
 
-refreshData <- function(session, output, dsn) {
+refreshData <- function(dsn) {
   con <- dbConnect(odbc(), dsn)
   freezers <- dbReadTable(con, "FreezerPhysical")
   freezerSections <- dbReadTable(con, "FreezerSection")
