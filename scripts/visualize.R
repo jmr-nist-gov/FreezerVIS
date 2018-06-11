@@ -32,7 +32,7 @@ prepBoxCount <- function(dat) {
   tubesort <- sort(unique(as.numeric(tubes$POSITION2)))
   out <- rbind(boxes, tubes)
   out$POSITION2 <- factor(out$POSITION2,
-                          levels = c(boxsort, tubesort))
+                          levels = unique(c(tubesort, boxsort)))
   out$POSITION1 <- as.factor(out$POSITION1)
   return(out)
 }
