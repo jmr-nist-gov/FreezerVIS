@@ -60,7 +60,7 @@ ui <- fluidPage(
    fluidRow(
      column(12,
             plotlyOutput(outputId = 'plotBoxes', 
-                         inline = T, 
+                         inline = TRUE, 
                          width = "100%", 
                          height = "1000px")
      )
