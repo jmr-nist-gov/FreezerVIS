@@ -6,8 +6,11 @@ ui <- fluidPage(
   div(id="mask", class="hidden", img(src="processing.gif"), h3("Refreshing collection data...")),
   useShinyjs(),
   tags$head(tags$style(HTML("
-    .rightAlign {float: right; display: block;}
-    #status {font-size: 10px; text-align: right;}
+    .rightAlign {float: right; display: inline-block;}
+    .leftAlign {float: left; display: inline-block;}
+    hr {margin-top: 10px; margin-bottom: 10px;}
+    #status {font-size: 10px; text-align: right; display: block}
+    #refresh {float: right; display: block; margin-top: 20px; width: 100%}
     .warning {color: red; font-weight:bold}
     .hidden {position: absolute; z-index: 1;}
     .overlay {position: absolute; z-index: 3; opacity: 0.85; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; background-color: White; color: Black;}
@@ -21,24 +24,20 @@ ui <- fluidPage(
    
   # Effective Header Page
   fluidRow(
-    column(8,
-           h2("NIST Marine Environmental Specimen Bank"),
-           h3("Freezer Visual Information System")),
-    column(4,
-           br(),
-           img(src="A product of NIST DTD.png", height = 60, width = 233, class = 'rightAlign'),
-           br(),
-           br(),
-           br(),
+    column(9,
+           # h2("NIST Marine Environmental Specimen Bank"),
+           h2("Freezer Visual Information System")
+           ),
+    column(3,
+           # img(src="DTD_logo_left.png", width = 259, class = 'rightAlign'),
            actionButton(inputId = 'refresh',
                         label = 'Refresh Data',
-                        icon = icon('refresh', lib = 'glyphicon'),
-                        width = '50%',
-                        class = 'rightAlign'),
-           br(),
-           br(),
+                        icon = icon('refresh', lib = 'glyphicon')),
            textOutput(outputId = 'status')
-    )
+           )#,
+    # column(2,
+    #        br(),
+    # )
   ),
   hr(),
   tabsetPanel(id = 'nav',

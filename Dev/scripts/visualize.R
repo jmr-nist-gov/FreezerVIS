@@ -231,20 +231,26 @@ vizFreezerPlotly <- function(counts, freezer) {
                 y = ~n,
                 color = ~CONTAINER_TYPE,
                 legendgroup = ~CONTAINER_TYPE,
-                text = ~paste0(ifelse(is.na(as.numeric(POSITION2)),
-                                      paste0("</br>Rack: ", rack,
-                                             "</br>Box: ", POSITION2),
-                                      paste0("</br>Pie: ", rack,
-                                             "</br>Basket: ", POSITION2)),
+                text = ~paste0(ifelse(grepl("Upright", freezer),
+                                      paste0("</br>Shelf: ", rack,
+                                             "</br>Basket: ", POSITION2),
+                                      ifelse(is.na(as.numeric(POSITION2)),
+                                             paste0("</br>Rack: ", rack,
+                                                    "</br>Box: ", POSITION2),
+                                             paste0("</br>Pie: ", rack,
+                                                    "</br>Basket: ", POSITION2))),
                                "</br>", CONTAINER_TYPE,
                                "</br>Count: ", n),
                 hoverinfo = 'text',
                 showlegend = showYesNo) %>%
         add_bars(orientation = 'v') %>%
         layout(barmode = 'stack',
-               annotations = list(text = ifelse(length(which(is.na(as.numeric(t$POSITION2)))) > 0,
-                                                paste("Rack", rack),
-                                                paste("Pie", rack)),
+               annotations = list(text = ifelse(grepl("Upright", freezer),
+                                                paste("Shelf", rack),
+                                                ifelse(length(which(is.na(as.numeric(t$POSITION2)))) > 0,
+                                                       paste("Rack", rack),
+                                                       paste("Pie", rack))
+                                                ),
                                   xref = 'paper',
                                   yref = 'paper',
                                   xanchor = 'left',
@@ -359,7 +365,7 @@ vizUsedFacets <- function(dat, showAll = FALSE, useMeanCR = FALSE, n_columns) {
           axis.text = element_blank(),
           axis.ticks.y = element_blank(),
           legend.position = 'bottom') +
-    facet_wrap(~paste0(freezerphysname, "\n", (100*round(used_capacity, 2)), "%"), 
+    facet_wrap(~paste0(gsub("Upright Freezer", "Upright", freezerphysname), "\n", (100*round(used_capacity, 3)), "%"), 
                ncol = n_columns) +
     scale_fill_gradientn(colours = c("darkgreen", "blue", "orange", "darkred", "darkred"),
                          values = c(0, 0.5, 0.75, 0.9, 1)) +
@@ -422,7 +428,7 @@ vizUsedRaceTrack <- function(dat, showAll = FALSE, useMeanCR = FALSE) {
     ggplot(aes(x = freezerphysname,
                y = used_capacity*100)) +
     geom_col(aes(fill = used_capacity*100)) +
-    geom_label(aes(label = paste0(freezerphysname, " (", round(used_capacity*100, 0), "%)")), 
+    geom_label(aes(label = paste0(gsub("Upright Freezer", "Upright", freezerphysname), " (", round(used_capacity*100, 0), "%)")), 
                y = 0,
                size = 3,
                label.size = NA, 

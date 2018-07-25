@@ -11,11 +11,11 @@ server <- function(input, output, session) {
       shinyjs::addClass("status", "warning")
       output$status <- renderText(paste0("Could not connect to Freezerworks! Using archived data (", as.Date(attr(counts, "asof")), ")."))
     # } else {
-      # shinyjs::removeClass("status", "warning")
-      # refreshData(dsn)
-      # counts <- read_rds("data/counts.RDS")
-      # output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
-      # }
+    #   shinyjs::removeClass("status", "warning")
+    #   refreshData(dsn)
+    #   counts <- read_rds("data/counts.RDS")
+    #   output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
+    # }
     if (!is.null(counts)) {
       output$bankView1 <- renderPlot(vizSpace('facets', showAll = FALSE))
       output$bankView2 <- renderPlot(vizSpace('track', showAll = FALSE))
@@ -43,8 +43,7 @@ server <- function(input, output, session) {
   # TAB REPOSITORY VIEW------------------------------------------------------------------------------
   ## Change to all freezers.
   observeEvent(input$showSome, {
-    hrz_cols <<- ifelse(input$showSome, 9, 11)
-    # hrz_cols <<- ceiling(length(unique(spaceDat$freezer_space_used$freezerphysname))/5)
+    hrz_cols <- 11
     output$bankView1 <- renderPlot(vizSpace('facets', showAll = !input$showSome, n_columns = hrz_cols))
     output$bankView2 <- renderPlot(vizSpace('track', showAll = !input$showSome))
     # output$badContainers <- renderPlot(vizSpace('bad', showAll = !input$showSome, usePlotly = FALSE))
@@ -95,7 +94,12 @@ server <- function(input, output, session) {
     #   }
     # } else {
       frz_selected <- strsplit(input$clickFacet$panelvar1, "\n")[[1]][1]
+      frz_selected <- gsub("Upright", "Upright Freezer", frz_selected)
     # }
+    if (!frz_selected %in% freezers$FreezerPhysName) {
+      alert(paste(frz_selected, "is not being tracked by Freezerworks. Space estimation is from basket counts only."))
+      return(NULL)
+    }
     if (!is.null(frz_selected)) {
       updateSelectInput(session,
                         inputId = 'selectFreezer',
@@ -114,17 +118,6 @@ server <- function(input, output, session) {
     viz <- suppressWarnings(vizFreezerPlotly(counts, input$selectFreezer))
     if (!is.null(viz)) {
       output$plotBoxes <- renderPlotly(viz)
-      # if (is.null(viz$Racks)) {
-      #   output$plotBoxes <- renderPlot(viz$Tubes, 
-      #                                  width = 1200, height = 1200, res = 100)
-      # } else if (is.null(viz$Tubes)) {
-      #   output$plotBoxes <- renderPlot(viz$Racks, 
-      #                                  width = 1200, height = 1200, res = 100)
-      # } else {
-      # output$plotBoxes <- renderPlot(grid.arrange(viz$Racks, viz$Tubes, 
-      #                                             nrow = 2, heights = c(0.67, 0.33)), 
-      #                                width = 1200, height = 1200, res = 100)
-      # }
     }
   })
   #--------------------------------------------------------------------------------------------------
@@ -142,7 +135,7 @@ server <- function(input, output, session) {
     saveRDS(basketCounts, "data/basketCounts.RDS")
     basketCounts <<- basketCounts
     spaceDat <<- spaceUsed()
-    hrz_cols <- ifelse(input$showSome, 7, 10)
+    hrz_cols <- 11
     output$bankView1 <- renderPlot(vizSpace('facets', showAll = !input$showSome, n_columns = hrz_cols))
     output$bankView2 <- renderPlot(vizSpace('track', showAll = !input$showSome, n_columns = hrz_cols))
   })
@@ -167,7 +160,8 @@ server <- function(input, output, session) {
                                                                           L = "Large",
                                                                           V = "Vario"),
                                                             FreezerPhysName = as.factor(FreezerPhysName),
-                                                            Description = as.factor(Description)),
+                                                            Description = as.factor(Description),
+                                                            Capacity = comma(Capacity)),
                                                    filter = 'top', 
                                                    colnames = c("Freezer", "Description", "Size", "2 mL Cryovial Capacity"),
                                                    rownames = FALSE))

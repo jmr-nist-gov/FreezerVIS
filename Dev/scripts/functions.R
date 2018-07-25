@@ -75,7 +75,7 @@ getFreezerCounts <- function(.counts = counts, .freezers = freezers, .freezerCap
                 select(-Size),
               by = c("Description" = "DESCRIPTION")) %>%
     left_join(.containerRatios) %>%
-    mutate(uses_capacity = (n*CT_Ratio/Capacity)) %>%
+    mutate(uses_capacity = round((n*CT_Ratio/Capacity), 4)) %>%
     select(FreezerPhysName, CONTAINER_TYPE, n, CT_Ratio, Capacity, uses_capacity) %>%
     ungroup()
   freezer_counts$FreezerPhysName <- as.factor(freezer_counts$FreezerPhysName)
@@ -129,9 +129,10 @@ spaceUsed <- function(.freezer_counts = freezer_counts,
   freezer_space_used <- freezer_space_used %>%
     group_by(freezerphysname) %>% 
     summarise(used_capacity = sum(uses_capacity, na.rm=T)) %>%
-    mutate(inputID = paste0(gsub(' ' ,'', freezerphysname), 'slide')) %>%
+    # mutate(inputID = paste0(gsub(' ' ,'', freezerphysname), 'slide')) %>%
     full_join(basketCounts) %>%
-    mutate(used_capacity = ifelse(is.na(used_capacity), 0, used_capacity + value/maxvalue),
+    mutate(used_capacity = ifelse(is.na(used_capacity), 0, used_capacity),
+           used_capacity = used_capacity + (value/maxvalue),
            freezerphysname = as.factor(freezerphysname))
   
   # Get plot orders
