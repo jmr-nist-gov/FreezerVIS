@@ -16,8 +16,20 @@ if (require(shinyjs) == FALSE) {
 if (require(plotly) == FALSE) {
   install.packages("plotly")
 }
+if (require(ggthemes) == FALSE) {
+  install.packages("ggthemes")
+}
 if (require(shinythemes) == FALSE) {
   install.packages("shinythemes")
+}
+if (require(DT) == FALSE) {
+  install.packages("DT")
+}
+if (require(scales) == FALSE) {
+  install.packages("scales")
+}
+if (require(yaml) == FALSE) {
+  install.packages("yaml")
 }
 library(odbc)
 library(DBI)
@@ -26,3 +38,6 @@ library(shiny)
 library(shinyjs)
 library(plotly)
 library(shinythemes)
+library(ggthemes)
+library(DT)
+library(scales)
