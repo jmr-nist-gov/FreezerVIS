@@ -197,8 +197,25 @@ vizFreezerPlotly <- function(counts, freezer) {
         unique(frzTubes$CONTAINER_TYPE))
     )
   )
-  frzTubes$CONTAINER_TYPE <- factor(as.character(frzTubes$CONTAINER_TYPE),
-                                    levels = container_levels)
+  toAdd <- which(container_levels %in% frzTubes$CONTAINER_TYPE == FALSE)
+  if (length(toAdd) > 0) {
+    for (container_type in container_levels[toAdd]) {
+      frzTubes <- rbind(frzTubes, 
+                        data.frame(POSITION1 = unique(frzTubes$POSITION1)[1],
+                                   CONTAINER_TYPE = container_type,
+                                   n = 0))
+    }
+  }
+  if (is.factor(frzTubes$CONTAINER_TYPE)) {
+    frzTubes$CONTAINER_TYPE <- as.character(frzTubes$CONTAINER_TYPE)
+  }
+  frzTubes <- frzTubes %>%
+    arrange(CONTAINER_TYPE) %>%
+    mutate(CONTAINER_TYPE = factor(CONTAINER_TYPE,
+                                    levels = container_levels))
+
+  toAdd <- 0
+  
   plotlys <- list()
   if (dim(frzRacks)[1] > 0) {
     plotlys$racks <- lapply(rackList, function(rack) {
@@ -223,9 +240,10 @@ vizFreezerPlotly <- function(counts, freezer) {
                                    n = 0))
         }
       }
-      t <- t %>% arrange(CONTAINER_TYPE)
-      t$CONTAINER_TYPE <- factor(t$CONTAINER_TYPE, 
-                                 levels = container_levels)
+      t <- t %>% 
+        arrange(CONTAINER_TYPE) %>%
+        mutate(CONTAINER_TYPE <- factor(CONTAINER_TYPE, 
+                                        levels = container_levels))
       p <- t %>% 
         plot_ly(x = ~POSITION2,
                 y = ~n,
