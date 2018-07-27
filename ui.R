@@ -53,7 +53,7 @@ ui <- fluidPage(
                                                      plotOutput(outputId = 'bankView1',
                                                                 inline = FALSE,
                                                                 width = '100%',
-                                                                height = '1000px',
+                                                                height = '1400px',
                                                                 click = 'clickFacet')
                                               # )
                                             )

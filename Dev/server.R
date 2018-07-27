@@ -6,16 +6,16 @@ server <- function(input, output, session) {
   observeEvent(input$refresh, ignoreNULL = FALSE, {
     shinyjs::addClass("mask", "overlay")
     shinyjs::removeClass("mask", "hidden")
-    # if (!validConnection(dsn)) {
+    if (!validConnection(dsn)) {
       counts <- read_rds("data/counts.RDS")
       shinyjs::addClass("status", "warning")
       output$status <- renderText(paste0("Could not connect to Freezerworks! Using archived data (", as.Date(attr(counts, "asof")), ")."))
-    # } else {
-    #   shinyjs::removeClass("status", "warning")
-    #   refreshData(dsn)
-    #   counts <- read_rds("data/counts.RDS")
-    #   output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
-    # }
+    } else {
+      shinyjs::removeClass("status", "warning")
+      refreshData(dsn)
+      counts <- read_rds("data/counts.RDS")
+      output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
+    }
     if (!is.null(counts)) {
       output$bankView1 <- renderPlot(vizSpace('facets', showAll = FALSE))
       output$bankView2 <- renderPlot(vizSpace('track', showAll = FALSE))
@@ -43,7 +43,7 @@ server <- function(input, output, session) {
   # TAB REPOSITORY VIEW------------------------------------------------------------------------------
   ## Change to all freezers.
   observeEvent(input$showSome, {
-    hrz_cols <- 11
+    hrz_cols <- 8
     output$bankView1 <- renderPlot(vizSpace('facets', showAll = !input$showSome, n_columns = hrz_cols))
     output$bankView2 <- renderPlot(vizSpace('track', showAll = !input$showSome))
     # output$badContainers <- renderPlot(vizSpace('bad', showAll = !input$showSome, usePlotly = FALSE))
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
     saveRDS(basketCounts, "data/basketCounts.RDS")
     basketCounts <<- basketCounts
     spaceDat <<- spaceUsed()
-    hrz_cols <- 11
+    hrz_cols <- 8
     output$bankView1 <- renderPlot(vizSpace('facets', showAll = !input$showSome, n_columns = hrz_cols))
     output$bankView2 <- renderPlot(vizSpace('track', showAll = !input$showSome, n_columns = hrz_cols))
   })
