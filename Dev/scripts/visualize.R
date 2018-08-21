@@ -166,11 +166,6 @@ vizFreezer <- function(counts, freezer, inApp=FALSE, usePlotly=TRUE, saveMe=FALS
 
 # Creates the freezer-level visualization directly using plotly to better space subplots.
 # Better to use inside the app but less flexible for reporting purposes.
-#   1. Set inApp = FALSE to use directly.
-#   2. Set usePlotly = FALSE to keep ggplot format.
-#   3. Set saveMe = TRUE to save to an environment variable.
-#   4. Set saveFile = TRUE to save the result as an RDS.
-# FreezerVIS sets inApp = TRUE and uses other option defaults.
 vizFreezerPlotly <- function(counts, freezer) {
   asof <- attributes(counts)$asof
   counts <- counts %>%
@@ -242,28 +237,35 @@ vizFreezerPlotly <- function(counts, freezer) {
       }
       t <- t %>% 
         arrange(CONTAINER_TYPE) %>%
-        mutate(CONTAINER_TYPE <- factor(CONTAINER_TYPE, 
-                                        levels = container_levels))
+        mutate(CONTAINER_TYPE = factor(CONTAINER_TYPE, 
+                                       levels = container_levels),
+               hovertext = paste0(
+                 if (grepl("Upright", freezer)) {
+                   paste0("</br>Shelf ", rack,
+                          "</br>Basket ", POSITION2)
+                 } else {
+                   if (is.na(as.numeric(POSITION2))) {
+                     paste0("</br>Rack ", rack,
+                            "</br>Box ", POSITION2)
+                   } else {
+                     paste0("</br>Pie ", rack,
+                            "</br>Basket ", POSITION2)
+                   }
+                 },
+                 "</br>", CONTAINER_TYPE,
+                 "</br>Count ", n)
+        )
       p <- t %>% 
         plot_ly(x = ~POSITION2,
                 y = ~n,
                 color = ~CONTAINER_TYPE,
                 legendgroup = ~CONTAINER_TYPE,
-                text = ~paste0(ifelse(grepl("Upright", freezer),
-                                      paste0("</br>Shelf: ", rack,
-                                             "</br>Basket: ", POSITION2),
-                                      ifelse(is.na(as.numeric(POSITION2)),
-                                             paste0("</br>Rack: ", rack,
-                                                    "</br>Box: ", POSITION2),
-                                             paste0("</br>Pie: ", rack,
-                                                    "</br>Basket: ", POSITION2))),
-                               "</br>", CONTAINER_TYPE,
-                               "</br>Count: ", n),
+                text = ~hovertext,
                 hoverinfo = 'text',
                 showlegend = showYesNo) %>%
         add_bars(orientation = 'v') %>%
         layout(barmode = 'stack',
-               annotations = list(text = ifelse(grepl("Upright", freezer),
+               annotations = list(text = ifelse(grepl("Upright", freezer) | grepl("Mechanical", freezer),
                                                 paste("Shelf", rack),
                                                 ifelse(length(which(is.na(as.numeric(t$POSITION2)))) > 0,
                                                        paste("Rack", rack),
