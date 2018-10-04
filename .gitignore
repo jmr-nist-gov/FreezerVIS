@@ -1,7 +1,6 @@
 .RData
 .Rhistory
 *.Rproj
-/data
 /.Rproj.user
 .Rproj.user
 *.Rout
