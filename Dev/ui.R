@@ -26,7 +26,7 @@ ui <- fluidPage(
   fluidRow(
     column(9,
            # h2("NIST Marine Environmental Specimen Bank"),
-           h2("Freezer Visual Information System")
+           h2("Freezer Visual Information System (development version)")
            ),
     column(3,
            # img(src="DTD_logo_left.png", width = 259, class = 'rightAlign'),
