@@ -68,8 +68,9 @@ refreshData <- function(dsn) {
 getFreezerCounts <- function(.counts = counts, .freezers = freezers, .freezerCapacity = freezerCapacity, .containerRatios = containerRatios) {
   freezer_counts <- .counts %>%
     group_by(FreezerPhysName) %>%
+    mutate(CONTAINER_TYPE = as.factor(CONTAINER_TYPE)) %>%
     count(CONTAINER_TYPE) %>%
-    left_join(.freezers %>% 
+    left_join(.freezers %>%
                 select(FreezerPhysName, Description)) %>%
     left_join(.freezerCapacity %>%
                 select(-Size),

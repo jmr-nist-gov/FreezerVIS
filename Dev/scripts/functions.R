@@ -78,7 +78,7 @@ getFreezerCounts <- function(.counts = counts, .freezers = freezers, .freezerCap
     mutate(uses_capacity = round((n*CT_Ratio/Capacity), 4)) %>%
     select(FreezerPhysName, CONTAINER_TYPE, n, CT_Ratio, Capacity, uses_capacity) %>%
     ungroup()
-  freezer_counts$FreezerPhysName <- as.factor(freezer_counts$FreezerPhysName)
+  # freezer_counts$FreezerPhysName <- as.factor(freezer_counts$FreezerPhysName)
   freezer_counts$CONTAINER_TYPE <- as.factor(freezer_counts$CONTAINER_TYPE)
   names(freezer_counts) <- tolower(names(freezer_counts))
   return(freezer_counts)
@@ -129,7 +129,6 @@ spaceUsed <- function(.freezer_counts = freezer_counts,
   freezer_space_used <- freezer_space_used %>%
     group_by(freezerphysname) %>% 
     summarise(used_capacity = sum(uses_capacity, na.rm=T)) %>%
-    # mutate(inputID = paste0(gsub(' ' ,'', freezerphysname), 'slide')) %>%
     full_join(basketCounts) %>%
     mutate(used_capacity = ifelse(is.na(used_capacity), 0, used_capacity),
            used_capacity = used_capacity + (value/maxvalue),
