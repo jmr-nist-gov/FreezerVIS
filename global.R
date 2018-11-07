@@ -11,6 +11,7 @@ freezerCapacity <- read_rds("data/freezerCapacity.RDS")
 containerRatios <- read_rds("data/containerRatios.RDS")
 basketCounts <- read_rds("data/basketCounts.RDS")
 freezers <- read_rds("data/freezers.RDS")
+SQLnameCT <- read_rds("data/SQLnameCT.RDS")
 n_freezers <- dim(freezers)[1]
 frz_list <- sort(freezers$FreezerPhysName)
 freezer_counts <- getFreezerCounts()
