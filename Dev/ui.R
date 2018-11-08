@@ -26,7 +26,7 @@ ui <- fluidPage(
   fluidRow(
     column(9,
            # h2("NIST Marine Environmental Specimen Bank"),
-           h2("Freezer Visual Information System (development version)")
+           h2("Freezer Visual Information System")
            ),
     column(3,
            # img(src="DTD_logo_left.png", width = 259, class = 'rightAlign'),
@@ -53,7 +53,7 @@ ui <- fluidPage(
                                                      plotOutput(outputId = 'bankView1',
                                                                 inline = FALSE,
                                                                 width = '100%',
-                                                                height = '1400px',
+                                                                height = '1000px',
                                                                 click = 'clickFacet')
                                               # )
                                             )
@@ -65,7 +65,7 @@ ui <- fluidPage(
                                                      plotOutput(outputId = 'bankView2',
                                                                 inline = FALSE,
                                                                 width = '100%',
-                                                                height = '1400px')
+                                                                height = '1200px')
                                               # )
                                             )
                                    ),

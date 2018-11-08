@@ -37,7 +37,15 @@ configureFreezerVIS <- function(DSN){
       cat("Successful connection available...\n")
     }
     cat("Connecting to Freezerworks at", DSN, "and refreshing basic tables. This will take a moment...\n")
-    refreshData(DSN)
+    # Get Freezerworks defined SQL field name for the 'Container Type' column.
+    default_CT_SQL <- askYesNo("Is the SQL name for your 'Container Type' data 'Container_Type'?")
+    if (default_CT_SQL) {
+      CT_SQL_name <- 'Container_Type'
+    } else {
+      CT_SQL_name <- readline(prompt = "Enter the SQL name for the field containing container type information:\t")
+    }
+    write_rds(CT_SQL_name, "data/SQLnameCT.RDS")
+    refreshData(dsn = DSN, CT_SQL_name = CT_SQL_name)
   
     getFreezers <- askYesNo("Generate placeholder table for Freezer Capacities?")
     cat("\nFreezer Capacities:\n")

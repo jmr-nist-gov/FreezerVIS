@@ -44,19 +44,19 @@ cleanUp <- function(aliquotCounts, freezerSections, freezers) {
 
 # Refreshes all necessary data to generate aliquot counts.
 # Also caches files necessary in case connectivity fails.
-refreshData <- function(dsn) {
+refreshData <- function(dsn, CT_SQL_name) {
   con <- dbConnect(odbc(), dsn)
   freezers <- dbReadTable(con, "FreezerPhysical")
   freezerSections <- dbReadTable(con, "FreezerSection")
-  aliquotCounts <- dbGetQuery(con,
-                              "SELECT FK_FreezerSectID,
-                              Container_Type,
-                              Position1,
-                              Position2,
-                              Position3,
-                              Position4
-                              FROM Aliquots
-                              WHERE NOT FK_FreezerSectID = 0 AND NOT Position1 = ''")
+  query <- paste0("SELECT FK_FreezerSectID, ",
+                  CT_SQL_name,
+                  ", Position1, ",
+                  "Position2, ",
+                  "Position3, ",
+                  "Position4 ",
+                  "FROM Aliquots ",
+                  "WHERE NOT FK_FreezerSectID = 0 AND NOT Position1 = ''")
+  aliquotCounts <- dbGetQuery(con, query)
   dbDisconnect(con)
   rm(con)
   aliquotCounts <- cleanUp(aliquotCounts, freezerSections, freezers)
@@ -68,9 +68,8 @@ refreshData <- function(dsn) {
 getFreezerCounts <- function(.counts = counts, .freezers = freezers, .freezerCapacity = freezerCapacity, .containerRatios = containerRatios) {
   freezer_counts <- .counts %>%
     group_by(FreezerPhysName) %>%
-    mutate(CONTAINER_TYPE = as.factor(CONTAINER_TYPE)) %>%
     count(CONTAINER_TYPE) %>%
-    left_join(.freezers %>%
+    left_join(.freezers %>% 
                 select(FreezerPhysName, Description)) %>%
     left_join(.freezerCapacity %>%
                 select(-Size),
@@ -79,7 +78,7 @@ getFreezerCounts <- function(.counts = counts, .freezers = freezers, .freezerCap
     mutate(uses_capacity = round((n*CT_Ratio/Capacity), 4)) %>%
     select(FreezerPhysName, CONTAINER_TYPE, n, CT_Ratio, Capacity, uses_capacity) %>%
     ungroup()
-  freezer_counts$FreezerPhysName <- as.factor(freezer_counts$FreezerPhysName)
+  # freezer_counts$FreezerPhysName <- as.factor(freezer_counts$FreezerPhysName)
   freezer_counts$CONTAINER_TYPE <- as.factor(freezer_counts$CONTAINER_TYPE)
   names(freezer_counts) <- tolower(names(freezer_counts))
   return(freezer_counts)
@@ -130,7 +129,6 @@ spaceUsed <- function(.freezer_counts = freezer_counts,
   freezer_space_used <- freezer_space_used %>%
     group_by(freezerphysname) %>% 
     summarise(used_capacity = sum(uses_capacity, na.rm=T)) %>%
-    # mutate(inputID = paste0(gsub(' ' ,'', freezerphysname), 'slide')) %>%
     full_join(basketCounts) %>%
     mutate(used_capacity = ifelse(is.na(used_capacity), 0, used_capacity),
            used_capacity = used_capacity + (value/maxvalue),

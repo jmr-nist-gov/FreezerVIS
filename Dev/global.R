@@ -6,6 +6,7 @@ if (!packageCompliance()) {
   stopApp()
 }
 dsn <- read_rds("data/DSN.RDS")
+CT_SQL_name <- read_rds("data/SQLnameCT.RDS")
 counts <- read_rds("data/counts.RDS")
 freezerCapacity <- read_rds("data/freezerCapacity.RDS")
 containerRatios <- read_rds("data/containerRatios.RDS")

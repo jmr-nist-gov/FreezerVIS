@@ -12,7 +12,7 @@ server <- function(input, output, session) {
       output$status <- renderText(paste0("Could not connect to Freezerworks! Using archived data (", as.Date(attr(counts, "asof")), ")."))
     } else {
       shinyjs::removeClass("status", "warning")
-      refreshData(dsn)
+      refreshData(dsn, CT_SQL_name)
       counts <<- read_rds("data/counts.RDS")
       output$status <- renderText(paste("Data last refreshed", attr(counts, "asof")))
     }

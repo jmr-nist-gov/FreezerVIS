@@ -44,19 +44,19 @@ cleanUp <- function(aliquotCounts, freezerSections, freezers) {
 
 # Refreshes all necessary data to generate aliquot counts.
 # Also caches files necessary in case connectivity fails.
-refreshData <- function(dsn) {
+refreshData <- function(dsn, CT_SQL_name) {
   con <- dbConnect(odbc(), dsn)
   freezers <- dbReadTable(con, "FreezerPhysical")
   freezerSections <- dbReadTable(con, "FreezerSection")
-  aliquotCounts <- dbGetQuery(con,
-                              "SELECT FK_FreezerSectID,
-                              Container_Type,
-                              Position1,
-                              Position2,
-                              Position3,
-                              Position4
-                              FROM Aliquots
-                              WHERE NOT FK_FreezerSectID = 0 AND NOT Position1 = ''")
+  query <- paste0("SELECT FK_FreezerSectID, ",
+                  CT_SQL_name,
+                  ", Position1, ",
+                  "Position2, ",
+                  "Position3, ",
+                  "Position4 ",
+                  "FROM Aliquots ",
+                  "WHERE NOT FK_FreezerSectID = 0 AND NOT Position1 = ''")
+  aliquotCounts <- dbGetQuery(con, query)
   dbDisconnect(con)
   rm(con)
   aliquotCounts <- cleanUp(aliquotCounts, freezerSections, freezers)
