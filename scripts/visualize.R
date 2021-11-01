@@ -207,12 +207,13 @@ vizFreezerPlotly <- function(counts, freezer) {
   frzTubes <- frzTubes %>%
     arrange(CONTAINER_TYPE) %>%
     mutate(CONTAINER_TYPE = factor(CONTAINER_TYPE,
-                                    levels = container_levels))
+                                    levels = container_levels)) %>%
+    filter(n > 0)
 
   toAdd <- 0
   
-  plotlys <- list()
-  if (dim(frzRacks)[1] > 0) {
+  plotlys <- list(racks = NULL, tubes = NULL)
+  if (nrow(frzRacks) > 0) {
     plotlys$racks <- lapply(rackList, function(rack) {
       t <- frzRacks %>% 
         group_by(POSITION1) %>%
@@ -240,7 +241,7 @@ vizFreezerPlotly <- function(counts, freezer) {
         mutate(CONTAINER_TYPE = factor(CONTAINER_TYPE, 
                                        levels = container_levels),
                hovertext = paste0(
-                 if (grepl("Upright", freezer)) {
+                 if (grepl("Upright|Mechanical", freezer)) {
                    paste0("</br>Shelf ", rack,
                           "</br>Basket ", POSITION2)
                  } else {
@@ -255,6 +256,7 @@ vizFreezerPlotly <- function(counts, freezer) {
                  "</br>", CONTAINER_TYPE,
                  "</br>Count ", n)
         )
+      y_max <- if (length(unique(t$POSITION2)) == 1) sum(t$n) else max(t$n)
       p <- t %>% 
         plot_ly(x = ~POSITION2,
                 y = ~n,
@@ -265,7 +267,7 @@ vizFreezerPlotly <- function(counts, freezer) {
                 showlegend = showYesNo) %>%
         add_bars(orientation = 'v') %>%
         layout(barmode = 'stack',
-               annotations = list(text = ifelse(grepl("Upright", freezer) | grepl("Mechanical", freezer),
+               annotations = list(text = ifelse(grepl("Upright|Mechanical", freezer),
                                                 paste("Shelf", rack),
                                                 ifelse(length(which(is.na(as.numeric(t$POSITION2)))) > 0,
                                                        paste("Rack", rack),
@@ -284,12 +286,13 @@ vizFreezerPlotly <- function(counts, freezer) {
                ),
                xaxis = list(type = 'category',
                             tickangle = 0),
-               yaxis = list(range = c(0, max(t$n)))
+               # yaxis = list(range = c(0, max(t$n)))
+               yaxis = list(range = c(0, y_max))
         )
       return(p)
     })
   }
-  if (dim(frzTubes)[1] > 0) {
+  if (nrow(frzTubes) > 0) {
     plotlys$tubes <- plot_ly(data = frzTubes,
                              x = ~POSITION1,
                              y = ~n,
