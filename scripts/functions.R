@@ -21,24 +21,29 @@ validConnection <- function(dsn) {
 
 # Properly combines multiple data frames into the target format/structure.
 cleanUp <- function(aliquotCounts, freezerSections, freezers) {
-  if ("FK_FreezerSectID" %in% names(aliquotCounts)) {
+  old_names <- names(aliquotCounts)
+  names(aliquotCounts) <- tolower(names(aliquotCounts))
+  names(freezerSections) <- tolower(names(freezerSections))
+  names(freezers) <- tolower(names(freezers))
+  # if ("FK_FreezerSectID" %in% names(aliquotCounts)) {
     aliquotCounts <- aliquotCounts %>%
       left_join(freezerSections %>%
-                  select("PK_FreezerSectID", "FK_FreezerPhysID"),
-                by = c("FK_FreezerSectID" = "PK_FreezerSectID")) %>%
+                  select("pk_freezersectid", "fk_freezerphysid"),
+                by = c("fk_freezersectid" = "pk_freezersectid")) %>%
       left_join(freezers %>%
-                  select("PK_FreezerPhysID", "FreezerPhysName"), 
-                by = c("FK_FreezerPhysID" = "PK_FreezerPhysID"))
-  } else {
-    aliquotCounts <- aliquotCounts %>%
-      left_join(freezerSections %>%
-                  select("PK_FreezerSectID", "FK_FreezerPhysID"),
-                by = c("FK_FREEZERSECTID" = "PK_FreezerSectID")) %>%
-      left_join(freezers %>%
-                  select("PK_FreezerPhysID", "FreezerPhysName"), 
-                by = c("FK_FreezerPhysID" = "PK_FreezerPhysID"))
-  }
+                  select("pk_freezerphysid", "freezerphysname"), 
+                by = c("fk_freezerphysid" = "pk_freezerphysid"))
+  # } else {
+  #   aliquotCounts <- aliquotCounts %>%
+  #     left_join(freezerSections %>%
+  #                 select("PK_FreezerSectID", "FK_FreezerPhysID"),
+  #               by = c("FK_FREEZERSECTID" = "PK_FreezerSectID")) %>%
+  #     left_join(freezers %>%
+  #                 select("PK_FreezerPhysID", "FreezerPhysName"), 
+  #               by = c("FK_FreezerPhysID" = "PK_FreezerPhysID"))
+  # }
   attr(aliquotCounts, "asof") <- Sys.time()
+  names(aliquotCounts) <- c(old_names, "PK_FreezerPhysID", "FreezerPhysName")
   return(aliquotCounts)
 }
 
@@ -47,7 +52,8 @@ cleanUp <- function(aliquotCounts, freezerSections, freezers) {
 refreshData <- function(dsn, CT_SQL_name) {
   con <- dbConnect(odbc(), dsn)
   freezers <- dbReadTable(con, "FreezerPhysical")
-  freezerSections <- dbReadTable(con, "FreezerSection")
+  freezerSections <- dbGetQuery(con, "SELECT PK_FreezerSectID, FK_FreezerPhysID FROM FreezerSection")
+  # freezerSections <- dbReadTable(con, "FreezerSection")
   query <- paste0("SELECT FK_FreezerSectID, ",
                   CT_SQL_name,
                   ", Position1, ",
