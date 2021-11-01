@@ -2,13 +2,13 @@ configureFreezerVIS <- function(DSN){
   cat("Configuring the Freezer Visual Information System...\n")
   cat("----------------------------------------------------\n")
   cat("Loading libraries and scripts...\n")
-  source("scripts/packageCompliance.R")
-  source("scripts/functions.R")
-  write_rds(DSN, "data/DSN.RDS")
+  source(file.path("scripts", "packageCompliance.R"))
+  source(file.path("scripts", "functions.R"))
+  write_rds(x = DSN, file = file.path("data", "DSN.RDS"))
   
   # Catch prior configuration through this mechanism
-  if (file.exists("data/ACFVIS.RDS")) {
-    config_history <- read_rds("data/ACFVIS.RDS")
+  if (file.exists(file.path("data", "ACFVIS.RDS"))) {
+    config_history <- read_rds(file.path("data", "ACFVIS.RDS"))
     review_config <- askYesNo("FreezerVIS was previously configured on this system. Would you like to review that configuration? Select 'No' to continue with a fresh configuration.")
     if (review_config) {
       View(config_history)
@@ -44,13 +44,13 @@ configureFreezerVIS <- function(DSN){
     } else {
       CT_SQL_name <- readline(prompt = "Enter the SQL name for the field containing container type information:\t")
     }
-    write_rds(CT_SQL_name, "data/SQLnameCT.RDS")
+    write_rds(x = CT_SQL_name, file = file.path("data", "SQLnameCT.RDS"))
     refreshData(dsn = DSN, CT_SQL_name = CT_SQL_name)
   
     getFreezers <- askYesNo("Generate placeholder table for Freezer Capacities?")
     cat("\nFreezer Capacities:\n")
     if (getFreezers){
-      freezers <- read_rds("data/freezers.RDS")
+      freezers <- read_rds(file.path("data", "freezers.RDS"))
       freezer_capacity <- freezers %>%
         select(Description) %>%
         unique() %>%
@@ -68,7 +68,7 @@ configureFreezerVIS <- function(DSN){
       } else {
         cat("If importing data later, ensure freezer descriptions match exactly with those generated here.\n")
       }
-      write_rds(freezer_capacity, "data/freezerCapacity.RDS")
+      write_rds(x = freezer_capacity, file = file.path("data", "freezerCapacity.RDS"))
     } else {
       cat("You did not generate a placeholder for freezer capacities directly from Freezerworks.")
     }
@@ -77,7 +77,7 @@ configureFreezerVIS <- function(DSN){
     getContainers <- askYesNo("Pull container types?")
     cat("\nContainer Types Ratios:\n")
     if (getContainers){
-      containers <- read_rds("data/counts.RDS") %>%
+      containers <- read_rds(file.path("data", "counts.RDS")) %>%
         distinct(CONTAINER_TYPE) %>%
         filter(!is.na(CONTAINER_TYPE)) %>%
         arrange(CONTAINER_TYPE) %>%
@@ -91,7 +91,7 @@ configureFreezerVIS <- function(DSN){
       } else {
         cat("If importing data later, ensure container types match exactly with those generated here.\n")
       }
-      write_rds(containers, "data/containerRatios.RDS")
+      write_rds(x = containers, file = file.path("data", "containerRatios.RDS"))
     } else {
       cat("You did not generate a placeholder for container type ratios directly from Freezerworks.")
     }
@@ -103,14 +103,14 @@ configureFreezerVIS <- function(DSN){
       view_all <- askYesNo("Open all data tables automatically for viewing?")
       cat("\nFreezerVIS setup results:\n")
       cat("\t1. FreezerVIS successfully loaded and ran setup.\n")
-      counts <<- read_rds("data/counts.RDS")
+      counts <<- read_rds(file.path("data", "counts.RDS"))
       if (view_all) View(counts)
-      freezers <<- read_rds("data/freezers.RDS")
+      freezers <<- read_rds(file.path("data", "freezers.RDS"))
       if (view_all) View(freezers)
       out_message <- "'counts', 'freezers'"
       cat("\t2. Data were pulled directly from Freezerworks.\n")
       if (getFreezers) {
-        freezer_capacity <<- read_rds("data/freezerCapacity.RDS")
+        freezer_capacity <<- read_rds(file.path("data", "freezerCapacity.RDS"))
         if (view_all) View(freezer_capacity)
         out_message <- paste0(out_message, ", 'freezer_capacity'")
         if (edited_freezers) {
@@ -122,7 +122,7 @@ configureFreezerVIS <- function(DSN){
         cat("\t3. You did not generate freezer capacities during setup. Please provide this via import and save to 'data/freezerCapacity.RDS'.\n")
       }
       if (getContainers) {
-        container_ratios <<- read_rds("data/containerRatios.RDS")
+        container_ratios <<- read_rds(file.path("data", "containerRatios.RDS"))
         if (view_all) View(container_ratios)
         out_message <- paste0(out_message, ", 'container_ratios'")
         if (edited_CTRs) {
@@ -134,7 +134,7 @@ configureFreezerVIS <- function(DSN){
       } else {
         cat("\t4. You did not generate container ratios during setup. Please provide this via import and save to 'data/containerRatios.RDS'.\n")
       }
-      basket_counts <<- read_rds("data/basketCounts.RDS")
+      basket_counts <<- read_rds(file.path("data", "basketCounts.RDS"))
       if (view_all) View(basket_counts)
       cat("\t5. A placeholder table for basket counts (default maximum of 12 baskets with zero used per freezer) was created for application functionality.\n")
       out_message <- paste0(out_message, ", and 'basket_counts'")
@@ -184,12 +184,12 @@ configureFreezerVIS <- function(DSN){
                         ifelse(refresh, "Successful", "Manual upload selected.")
     )
   )
-  write_rds(config_history, "data/ACFVIS.RDS")
+  write_rds(x = config_history, file = file.path("data", "ACFVIS.RDS"))
 }
 
 setupBaskets <- function() {
   if (file.exists("data/freezers.RDS")) {
-    basketCounts <- read_rds("data/freezers.RDS") %>%
+    basketCounts <- read_rds(file.path("data", "freezers.RDS")) %>%
       select(PK_FreezerPhysID, FreezerPhysName) %>%
       mutate(useOutputID = gsub(" ", "", FreezerPhysName),
              useInputID = paste0(useOutputID, "slide"),
@@ -197,8 +197,9 @@ setupBaskets <- function() {
              value = 0,
              FreezerPhysName = as.character(FreezerPhysName)) %>%
       rename('freezerphysname' = FreezerPhysName)
-    write_rds(basketCounts, "data/basketCounts.RDS")
+    write_rds(x = basketCounts, file = file.path("data", "basketCounts.RDS"))
   } else {
-    stop("Cannot find file 'data/freezers/RDS', run 'configureFreezerVIS(DSN)' first.")
+    stop(sprintf("Cannot find file '%s', run 'configureFreezerVIS(DSN)' first.",
+                 file.path("data", "freezers.RDS")))
   }
 }

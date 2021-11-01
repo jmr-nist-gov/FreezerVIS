@@ -152,7 +152,7 @@ vizFreezer <- function(counts, freezer, inApp=FALSE, usePlotly=TRUE, saveMe=FALS
       return(out)
     }
     if (saveFile) {
-      write_rds(out, gsub(" ", "_", paste0("NIST_MESB_", freezer, "_visual_saved_", Sys.time(), ".RDS")))
+      write_rds(x = out, file = gsub(" ", "_", paste0("NIST_MESB_", freezer, "_visual_saved_", Sys.time(), ".RDS")))
     }
   } else {
     if (inApp) {

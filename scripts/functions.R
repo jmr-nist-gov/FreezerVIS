@@ -66,8 +66,8 @@ refreshData <- function(dsn, CT_SQL_name) {
   dbDisconnect(con)
   rm(con)
   aliquotCounts <- cleanUp(aliquotCounts, freezerSections, freezers)
-  write_rds(aliquotCounts, path = "data/counts.RDS", compress = "none")
-  write_rds(freezers, path = "data/freezers.RDS", compress = "none")
+  write_rds(x = aliquotCounts, file = file.path("data", "counts.RDS"))
+  write_rds(x = freezers, file = file.path("data", "freezers.RDS"))
 }
 
 # Get freezer counts. This mostly supports repository-level visualization
