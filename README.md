@@ -2,9 +2,13 @@
 
 FreezerVIS connects directly to the sample management database used in the NIST Biorepository. It enables high level visualization of the contents of a sample repository to address questions around asset management of freezer space utilization (e.g. how much has been used?) and allocation (e.g. how are samples distributed?).
 
+![example freezer space visualization](www.example_plots.jpg)
+
+Read more from the [poster](http://dx.doi.org/10.13140/RG.2.2.10864.40968) at the 2019 ISBER Regional Meeting.
+
 This is accomplished through [R](https://www.r-project.org/) via the [Shiny](https://shiny.rstudio.com/) package and connects using an Open Database Connectivity (ODBC) driver. If you can connect to your database through R (or can create a scheduled data update via another language), you should be able to make any necessary modifications to use FreezrVIS in your repository.
 
-![alt-text](www/example_flow.jpg)
+![example data flow from Freezerworks through R to the end user interface](www/example_flow.jpg)
 
 For now, FreezerVIS only supports the Freezerworks Sample Management System* by [Dataworks Development Inc](https://freezerworks.com/). Any sample managment database available via ODBC should be amenable to inclusion provided a query can return Freezer Name, three position identifiers (e.g. Rack, Box, Position), and Container Type.
 
