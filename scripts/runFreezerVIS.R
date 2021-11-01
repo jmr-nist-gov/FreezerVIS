@@ -1,2 +1,1 @@
-setwd("O:/Data Tool Development/Freezerworks/FreezerVIS")
-runApp(launch.browser=TRUE)
+shiny::runApp("O:/Data Tool Development/Freezerworks/FreezerVIS", launch.browser=TRUE)
