@@ -2,7 +2,7 @@
 
 FreezerVIS connects directly to the sample management database used in the NIST Biorepository. It enables high level visualization of the contents of a sample repository to address questions around asset management of freezer space utilization (e.g. how much has been used?) and allocation (e.g. how are samples distributed?).
 
-![example freezer space visualization](www.example_plots.jpg)
+![example freezer space visualization](www/example_plots.jpg)
 
 Read more from the [poster](http://dx.doi.org/10.13140/RG.2.2.10864.40968) at the 2019 ISBER Regional Meeting.
 
